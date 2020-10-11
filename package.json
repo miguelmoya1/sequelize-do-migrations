@@ -11,9 +11,6 @@
     "type": "git",
     "url": "https://github.com/miguelmoya1/sequelize-do-migrations"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "private": false,
   "dependencies": {
     "@types/sequelize": "^4.28.9",
