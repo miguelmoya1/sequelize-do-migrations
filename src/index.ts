@@ -1,31 +1,53 @@
-import { DataTypes, Sequelize, Model } from 'sequelize';
-import * as fs from 'fs';
-import * as path from 'path';
+import { DataTypes, Sequelize, Model } from "sequelize";
+import * as fs from "fs";
+import * as path from "path";
 
-interface IMigrationType {
+/**
+ * Interface for migration files inside options.path
+ */
+export interface IMigrationType {
   up: (sequelize: Sequelize) => Promise<void>;
   down: (sequelize: Sequelize) => Promise<void>;
 }
 
-type IMigrations = { name: string };
+type Migrations = { name: string };
 
-class SequelizeMigrations extends Model<IMigrations, IMigrations> implements IMigrations {
+type options = {
+  /**
+   * by default in the same folder, called "migrations"
+   */
+  path?: string;
+  /**
+   * true by defult
+   */
+  showLogs?: boolean;
+};
+
+class SequelizeMigrations
+  extends Model<Migrations, Migrations>
+  implements Migrations {
   public name!: string;
 }
 
-const runMigrations = async (sequelize: Sequelize, pathToMigrations?: string) => {
-  console.log('\x1b[34m', 'RUNNING MIGRATIONS...', '\x1b[0m');
+const runMigrations = async (sequelize: Sequelize, options: options) => {
+  let { path: pathToMigrations } = options;
+  const { showLogs } = options;
+
+  if (showLogs) console.log("\x1b[34m", "RUNNING MIGRATIONS...", "\x1b[0m");
 
   if (!pathToMigrations) {
-    pathToMigrations = path.join(path.dirname(getParentPath()), './migration');
+    pathToMigrations = path.join(path.dirname(getParentPath()), "./migration");
     try {
       fs.accessSync(pathToMigrations);
     } catch {
-      pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
+      pathToMigrations = path.join(
+        path.dirname(getParentPath()),
+        "./migrations"
+      );
     }
   }
 
-  console.log('PATH MIGRATIONS: ', pathToMigrations);
+  if (showLogs) console.log("PATH MIGRATIONS: ", pathToMigrations);
 
   const files = fs.readdirSync(pathToMigrations);
 
@@ -41,16 +63,23 @@ const runMigrations = async (sequelize: Sequelize, pathToMigrations?: string) =>
 
   for await (const file of files) {
     if (file && migrations.findIndex((m) => m.name === file) === -1) {
-      const migration: IMigrationType = require(path.join(pathToMigrations, file));
+      const migration: IMigrationType = require(path.join(
+        pathToMigrations,
+        file
+      ));
       try {
         await migration.up(sequelize);
         await SequelizeMigrations.create({ name: file });
       } catch {
         await migration.down(sequelize);
-        console.log('THE MIGRATION COULD NOT BE RUN: ', file);
+        if (showLogs) console.log("THE MIGRATION COULD NOT BE RUN: ", file);
       }
     } else {
-      console.log(`${'\x1b[33m'}${file} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`);
+      if (showLogs) {
+        console.log(
+          `${"\x1b[33m"}${file} ${"\x1b[31m"}IT HAS ALREADY BEEN ADDED PREVIOUSLY${"\x1b[0m"}`
+        );
+      }
     }
   }
 };

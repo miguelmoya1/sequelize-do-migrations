@@ -1,18 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-
     "strictNullChecks": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noImplicitAny": false,
-
-    "removeComments": true,
+    "removeComments": false,
     "declaration": true,
     "sourceMap": false,
-
     "target": "esnext",
     "outDir": "./",
     "types":  ["node"],
