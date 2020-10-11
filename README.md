@@ -22,3 +22,27 @@ Call the function passing it the connection of sequelize, passing it the connect
 
     path?: string;
     showLogs?: boolean;
+
+By default, **showLogs** is false, if true, prints logs by console.log.
+
+The path to the migrations folder, by default, is in the same folder from where the function is called, it looks for a folder called **migrations** or **miration** unless the path parameter is modified.
+
+An example of migration is to create a file called 01_XXXXX.ts (It can be any name as long as it is not repeated) inside the migrations folder with the following code:
+
+    import { DataTypes, Sequelize } from 'sequelize';
+
+    export const up = async (sequelize: Sequelize) => {
+      const user = await sequelize.models.User.describe();
+      if (!user.location) {
+        await sequelize.getQueryInterface().addColumn('Users', 'location', {
+          type: DataTypes.GEOGRAPHY,
+        });
+      }
+    };
+
+    export const down = async (sequelize: Sequelize) => {
+      const user = await sequelize.models.User.describe();
+      if (user.location) {
+        await sequelize.getQueryInterface().removeColumn('Users', 'location');
+      }
+    };
