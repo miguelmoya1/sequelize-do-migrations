@@ -1,6 +1,6 @@
 {
   "name": "sequelize-do-migrations",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Perform migrations from code in typescript",
   "main": "index.js",
   "module": "index.js",
