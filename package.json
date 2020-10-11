@@ -1,10 +1,9 @@
 {
   "name": "sequelize-do-migrations",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Perform migrations from code in typescript",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "module": "index.js",
   "author": "Miguelmo <miguelmoyaortega@gmail.com>",
   "license": "MIT",
   "private": false,
