@@ -14,10 +14,10 @@
     "sourceMap": false,
 
     "target": "esnext",
-    "outDir": "./dist",
+    "outDir": "./",
     "types":  ["node"],
     "moduleResolution": "node"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "dist"],
+  "exclude": ["node_modules"]
 }
