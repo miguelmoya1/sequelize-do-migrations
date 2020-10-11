@@ -1,0 +1,13 @@
+{
+  "name": "sequelize-migrations",
+  "version": "1.0.0",
+  "description": "Perform migrations from code in typescript",
+  "main": "index.js",
+  "author": "Miguelmo <miguelmoyaortega@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@types/sequelize": "^4.28.9",
+    "sequelize": "^6.3.5"
+  }
+}
