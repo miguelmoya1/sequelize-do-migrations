@@ -25,7 +25,7 @@ Call the function passing it the connection of sequelize, passing it the connect
 
 By default, **showLogs** is false, if true, prints logs by console.log.
 
-The path to the migrations folder, by default, is in the same folder from where the function is called, it looks for a folder called **migrations** or **miration** unless the path parameter is modified.
+The path to the migrations folder, by default, is in the same folder from where the function is called, it looks for a folder called **migrations** or **migration** unless the path parameter is modified.
 
 An example of migration is to create a file called 01_XXXXX.ts (It can be any name as long as it is not repeated) inside the migrations folder with the following code:
 
