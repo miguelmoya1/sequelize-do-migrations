@@ -11,10 +11,10 @@
     "declaration": true,
     "sourceMap": false,
     "target": "esnext",
-    "outDir": "./",
+    "outDir": "./dist",
     "types":  ["node"],
     "moduleResolution": "node"
   },
-  "include": ["src", "dist"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

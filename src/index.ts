@@ -1,6 +1,6 @@
-import { DataTypes, Sequelize, Model } from "sequelize";
-import * as fs from "fs";
-import * as path from "path";
+import { DataTypes, Sequelize, Model } from 'sequelize';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Interface for migration files inside options.path
@@ -18,7 +18,7 @@ type options = {
    */
   path?: string;
   /**
-   * true by defult
+   * false by defult
    */
   showLogs?: boolean;
 };
@@ -29,25 +29,25 @@ class SequelizeMigrations
   public name!: string;
 }
 
-const runMigrations = async (sequelize: Sequelize, options: options) => {
+const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   let { path: pathToMigrations } = options;
   const { showLogs } = options;
 
-  if (showLogs) console.log("\x1b[34m", "RUNNING MIGRATIONS...", "\x1b[0m");
+  if (showLogs) console.log('\x1b[34m', 'RUNNING MIGRATIONS...', '\x1b[0m');
 
   if (!pathToMigrations) {
-    pathToMigrations = path.join(path.dirname(getParentPath()), "./migration");
+    pathToMigrations = path.join(path.dirname(getParentPath()), './migration');
     try {
       fs.accessSync(pathToMigrations);
     } catch {
       pathToMigrations = path.join(
         path.dirname(getParentPath()),
-        "./migrations"
+        './migrations'
       );
     }
   }
 
-  if (showLogs) console.log("PATH MIGRATIONS: ", pathToMigrations);
+  if (showLogs) console.log('PATH MIGRATIONS: ', pathToMigrations);
 
   const files = fs.readdirSync(pathToMigrations);
 
@@ -72,12 +72,12 @@ const runMigrations = async (sequelize: Sequelize, options: options) => {
         await SequelizeMigrations.create({ name: file });
       } catch {
         await migration.down(sequelize);
-        if (showLogs) console.log("THE MIGRATION COULD NOT BE RUN: ", file);
+        if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', file);
       }
     } else {
       if (showLogs) {
         console.log(
-          `${"\x1b[33m"}${file} ${"\x1b[31m"}IT HAS ALREADY BEEN ADDED PREVIOUSLY${"\x1b[0m"}`
+          `${'\x1b[33m'}${file} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
         );
       }
     }
