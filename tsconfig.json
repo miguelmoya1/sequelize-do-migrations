@@ -15,8 +15,8 @@
 
     "target": "esnext",
     "outDir": "./dist",
-    "types": ["node"],
+    "types": ["index.d.ts", "node"],
     "moduleResolution": "node"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
