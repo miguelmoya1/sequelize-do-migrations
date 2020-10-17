@@ -11,3 +11,5 @@ examples
 !*.d.ts
 src
 .prettierrc
+test
+jest.config.js

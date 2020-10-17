@@ -1,7 +1,6 @@
 import { DataTypes, Sequelize, Model } from 'sequelize';
 import * as fs from 'fs';
 import * as path from 'path';
-
 /**
  * Interface for migration files inside options.path
  */
@@ -12,7 +11,7 @@ export interface IMigrationType {
 
 type Migrations = { name: string };
 
-type options = {
+export type options = {
   /**
    * by default in the same folder, called "migrations"
    */
@@ -32,18 +31,24 @@ class SequelizeMigrations
 const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   let { path: pathToMigrations } = options;
   const { showLogs } = options;
+  const created: string[] = [];
 
   if (showLogs) console.log('\x1b[34m', 'RUNNING MIGRATIONS...', '\x1b[0m');
 
   if (!pathToMigrations) {
-    pathToMigrations = path.join(path.dirname(getParentPath()), './migration');
+    pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
+    if (!fs.existsSync(pathToMigrations)) {
+      fs.mkdirSync(pathToMigrations);
+    }
+  }
+
+  try {
+    fs.accessSync(pathToMigrations);
+  } catch {
     try {
-      fs.accessSync(pathToMigrations);
+      fs.mkdirSync(pathToMigrations);
     } catch {
-      pathToMigrations = path.join(
-        path.dirname(getParentPath()),
-        './migrations'
-      );
+      if (showLogs) console.log('THE DIRECTORY COULD NOT BE CREATED');
     }
   }
 
@@ -69,9 +74,12 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
       ));
       try {
         await migration.up(sequelize);
-        await SequelizeMigrations.create({ name: file });
+        await SequelizeMigrations.create({
+          name: file.split('.').slice(0, -1).join('.'),
+        });
+        created.push(file);
       } catch {
-        await migration.down(sequelize);
+        if (migration.down) await migration.down(sequelize);
         if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', file);
       }
     } else {
@@ -82,6 +90,8 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
       }
     }
   }
+
+  return created;
 };
 
 const getParentPath = () => {

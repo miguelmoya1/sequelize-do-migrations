@@ -12,7 +12,7 @@
     "sourceMap": false,
     "target": "esnext",
     "outDir": "./dist",
-    "types":  ["node"],
+    "types":  ["node", "jest"],
     "moduleResolution": "node"
   },
   "include": ["src"],
