@@ -37,19 +37,10 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
 
   if (!pathToMigrations) {
     pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
-    if (!fs.existsSync(pathToMigrations)) {
-      fs.mkdirSync(pathToMigrations);
-    }
   }
 
-  try {
-    fs.accessSync(pathToMigrations);
-  } catch {
-    try {
-      fs.mkdirSync(pathToMigrations);
-    } catch {
-      if (showLogs) console.log('THE DIRECTORY COULD NOT BE CREATED');
-    }
+  if (!fs.existsSync(pathToMigrations)) {
+    fs.mkdirSync(pathToMigrations);
   }
 
   if (showLogs) console.log('PATH MIGRATIONS: ', pathToMigrations);
