@@ -7,32 +7,32 @@ import { Model } from 'sequelize';
 class User extends Model {
   public id!: string;
 }
+const deleteDir = () => {
+  if (fs.existsSync(path.join(__dirname, './migrations/'))) {
+    fs.rmdirSync(path.join(__dirname, './migrations/'), { recursive: true });
+  }
+};
+
+const createDir = () => {
+  if (!fs.existsSync(path.join(__dirname, './migrations/'))) {
+    fs.mkdirSync(path.join(__dirname, './migrations/'));
+  }
+};
+
+const createFile = (withError = false) => {
+  const fileName = `${Math.floor(100000 + Math.random() * 900000)}.ts`;
+  fs.writeFileSync(
+    path.join(__dirname, './migrations', fileName),
+    (withError
+      ? 'export const up = () => { throw new Error("error"); };'
+      : 'export const up = () => {};'
+    ).concat(' export const down = () => {};')
+  );
+  return fileName;
+};
 
 describe('MAIN TEST', () => {
   let sequelize: Sequelize;
-  const deleteDir = () => {
-    if (fs.existsSync(path.join(__dirname, './migrations/'))) {
-      fs.rmdirSync(path.join(__dirname, './migrations/'), { recursive: true });
-    }
-  };
-
-  const createDir = () => {
-    if (!fs.existsSync(path.join(__dirname, './migrations/'))) {
-      fs.mkdirSync(path.join(__dirname, './migrations/'));
-    }
-  };
-
-  const createFile = (withError = false) => {
-    const fileName = `${Math.floor(100000 + Math.random() * 900000)}.ts`;
-    fs.writeFileSync(
-      path.join(__dirname, './migrations', fileName),
-      (withError
-        ? 'export const up = () => { throw new Error("error"); };'
-        : 'export const up = () => {};'
-      ).concat(' export const down = () => {};')
-    );
-    return fileName;
-  };
 
   beforeAll(async () => {
     // WE CREATE A TEST DATABASE
