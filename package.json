@@ -1,6 +1,6 @@
 {
   "name": "sequelize-do-migrations",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Perform migrations from code in typescript",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@types/sequelize": "^4.28.9",
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    "sequelize-do-migrations": "^1.0.21"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
