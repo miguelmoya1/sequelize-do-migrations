@@ -8,20 +8,31 @@ class User extends Model {
   public id!: string;
 }
 
-const deleteDir = () => {
-  if (fs.existsSync(path.join(__dirname, './migrations/'))) {
-    fs.rmdirSync(path.join(__dirname, './migrations/'), { recursive: true });
-  }
-};
-
-const createDir = () => {
-  if (!fs.existsSync(path.join(__dirname, './migrations/'))) {
-    fs.mkdirSync(path.join(__dirname, './migrations/'));
-  }
-};
-
 describe('MAIN TEST', () => {
   let sequelize: Sequelize;
+  const deleteDir = () => {
+    if (fs.existsSync(path.join(__dirname, './migrations/'))) {
+      fs.rmdirSync(path.join(__dirname, './migrations/'), { recursive: true });
+    }
+  };
+
+  const createDir = () => {
+    if (!fs.existsSync(path.join(__dirname, './migrations/'))) {
+      fs.mkdirSync(path.join(__dirname, './migrations/'));
+    }
+  };
+
+  const createFile = (withError = false) => {
+    const fileName = `${Math.floor(100000 + Math.random() * 900000)}.ts`;
+    fs.writeFileSync(
+      path.join(__dirname, './migrations', fileName),
+      (withError
+        ? 'export const up = () => { throw new Error("error"); };'
+        : 'export const up = () => {};'
+      ).concat(' export const down = () => {};')
+    );
+    return fileName;
+  };
 
   beforeAll(async () => {
     // WE CREATE A TEST DATABASE
@@ -38,12 +49,10 @@ describe('MAIN TEST', () => {
       },
       { sequelize }
     );
-
-    // CREATE THE TABLE
-    await User.sync();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await sequelize.sync({ force: true });
     createDir();
   });
 
@@ -56,11 +65,26 @@ describe('MAIN TEST', () => {
   });
 
   it('Check that the up works', async () => {
-    const name = '001_testNameUser.ts';
-    fs.writeFileSync(
-      path.join(__dirname, './migrations', name),
-      'export const up = () => {}'
-    );
+    const name = createFile();
     expect(await runMigrations(sequelize)).toStrictEqual([name]);
+  });
+
+  it('Check that the down works', async () => {
+    createFile(true);
+    expect(await runMigrations(sequelize)).toStrictEqual([]);
+  });
+
+  it('Check multiples times run migrations', async () => {
+    const name = createFile();
+    expect(await runMigrations(sequelize)).toStrictEqual([name]);
+    expect(await runMigrations(sequelize)).toStrictEqual([]);
+  });
+
+  it('Check multiples migrations', async () => {
+    const name = createFile();
+    const name2 = createFile();
+    createFile(true);
+    expect(await runMigrations(sequelize)).toStrictEqual([name, name2]);
+    expect(await runMigrations(sequelize)).toStrictEqual([]);
   });
 });
