@@ -18,8 +18,7 @@
   },
   "dependencies": {
     "@types/sequelize": "^4.28.9",
-    "sequelize": "^6.3.5",
-    "sequelize-do-migrations": "^1.0.21"
+    "sequelize": "^6.3.5"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
