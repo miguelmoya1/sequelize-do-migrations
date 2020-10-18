@@ -14,14 +14,22 @@ Or npm:
 
 ## How to use
 
-To use the library you must import **runMigrations**
+To use the library you must import **runMigrations**:
 
     import { runMigrations } from 'sequelize-do-migrations';
 
 Call the function passing it the connection of sequelize, passing it the connection of sequelize, optionally you can pass another parameter with options:
 
-    path?: string;
-    showLogs?: boolean;
+    runMigrations(sequelize, options);
+
+**Return**: An array of strings with the name of the files executed and saved in the database.
+
+The options:
+
+    {
+      path?: string;
+      showLogs?: boolean;
+    }
 
 By default, **showLogs** is false, if true, prints logs by console.log.
 

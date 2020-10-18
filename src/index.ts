@@ -1,13 +1,14 @@
 import { DataTypes, Sequelize, Model } from 'sequelize';
 import * as fs from 'fs';
 import * as path from 'path';
+
 /**
  * Interface for migration files inside options.path
  */
-export interface IMigrationType {
+export type IMigrationType = {
   up: (sequelize: Sequelize) => Promise<void>;
   down: (sequelize: Sequelize) => Promise<void>;
-}
+};
 
 type Migrations = { name: string };
 
@@ -28,6 +29,12 @@ class SequelizeMigrations
   public name!: string;
 }
 
+/**
+ * Execute the migrations that are in the ./migratios folder or the one specified in options.path
+ * @param sequelize Connection where do you want to save the migration history
+ * @param options type options
+ * @returns An array of strings with the name of the files executed and saved in the database
+ */
 const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   let { path: pathToMigrations } = options;
   const { showLogs } = options;
