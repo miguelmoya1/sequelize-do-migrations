@@ -14,7 +14,10 @@
   "private": false,
   "scripts": {
     "start": "tsc -w",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "prebuild": "jest",
+    "build": "tsc",
+    "prepublish": "yarn build"
   },
   "dependencies": {
     "@types/sequelize": "^4.28.9",
