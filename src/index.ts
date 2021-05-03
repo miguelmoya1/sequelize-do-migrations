@@ -52,7 +52,9 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
 
   if (showLogs) console.log('PATH MIGRATIONS: ', pathToMigrations);
 
-  const files = fs.readdirSync(pathToMigrations);
+  const files = fs
+    .readdirSync(pathToMigrations)
+    .filter((f) => f.endsWith('.js') && !f.endsWith('.map.js'));
 
   SequelizeMigrations.init(
     {
