@@ -23,13 +23,7 @@ export type options = {
   showLogs?: boolean;
 };
 
-class SequelizeMigrations
-  extends Model<Migrations, Migrations>
-  implements Migrations
-{
-  public name!: string;
-  public dataValues!: Migrations;
-}
+class SequelizeMigrations extends Model<Migrations> {}
 
 /**
  * Execute the migrations that are in the ./migratios folder or the one specified in options.path
@@ -67,10 +61,7 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   );
 
   await SequelizeMigrations.sync();
-  const migrations = (await SequelizeMigrations.findAll()).map((m) => ({
-    ...m,
-    ...m.dataValues,
-  }));
+  const migrations = (await SequelizeMigrations.findAll()) as any;
 
   for await (const name of files) {
     if (name && migrations.findIndex((m) => m.name === name) === -1) {
