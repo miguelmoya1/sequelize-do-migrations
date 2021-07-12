@@ -28,6 +28,7 @@ class SequelizeMigrations
   implements Migrations
 {
   public name!: string;
+  public dataValues!: Migrations;
 }
 
 /**
@@ -66,9 +67,10 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   );
 
   await SequelizeMigrations.sync();
-  const migrations = await SequelizeMigrations.findAll();
-
-  console.log(migrations);
+  const migrations = (await SequelizeMigrations.findAll()).map((m) => ({
+    ...m,
+    ...m.dataValues,
+  }));
 
   for await (const name of files) {
     if (name && migrations.findIndex((m) => m.name === name) === -1) {
@@ -83,7 +85,6 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
         });
         created.push(name);
       } catch (e) {
-        console.log(e);
         if (migration.down) await migration.down(sequelize);
         if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', name);
       }
