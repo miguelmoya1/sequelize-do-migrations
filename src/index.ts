@@ -25,7 +25,8 @@ export type options = {
 
 class SequelizeMigrations
   extends Model<Migrations, Migrations>
-  implements Migrations {
+  implements Migrations
+{
   public name!: string;
 }
 
@@ -54,7 +55,8 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
 
   const files = fs
     .readdirSync(pathToMigrations)
-    .filter((f) => f.endsWith('.js') && !f.endsWith('.map.js'));
+    .filter((f) => f.endsWith('.js') && !f.endsWith('.map.js'))
+    .map((file) => file.split('.').slice(0, -1).join('.'));
 
   SequelizeMigrations.init(
     {
@@ -66,26 +68,29 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   await SequelizeMigrations.sync();
   const migrations = await SequelizeMigrations.findAll();
 
-  for await (const file of files) {
-    if (file && migrations.findIndex((m) => m.name === file) === -1) {
+  console.log(migrations);
+
+  for await (const name of files) {
+    if (name && migrations.findIndex((m) => m.name === name) === -1) {
       const migration: IMigrationType = require(path.join(
         pathToMigrations,
-        file
+        name
       ));
       try {
         await migration.up(sequelize);
         await SequelizeMigrations.create({
-          name: file.split('.').slice(0, -1).join('.'),
+          name,
         });
-        created.push(file);
-      } catch {
+        created.push(name);
+      } catch (e) {
+        console.log(e);
         if (migration.down) await migration.down(sequelize);
-        if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', file);
+        if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', name);
       }
     } else {
       if (showLogs) {
         console.log(
-          `${'\x1b[33m'}${file} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
+          `${'\x1b[33m'}${name} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
         );
       }
     }
