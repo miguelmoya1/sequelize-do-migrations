@@ -1,6 +1,6 @@
 {
   "name": "sequelize-do-migrations",
-  "version": "1.0.41",
+  "version": "1.0.43",
   "description": "Perform migrations from code in typescript",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -19,14 +19,14 @@
     "prepublish": "yarn build"
   },
   "dependencies": {
-    "sequelize": "^6.6.5"
+    "sequelize": "^6.12.4"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/sequelize": "4.28.10",
-    "jest": "^27.0.6",
-    "ts-jest": "^27.0.3",
-    "typescript": "^4.3.5"
+    "@types/jest": "^27.0.3",
+    "@types/sequelize": "4.28.11",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.5.4"
   },
   "keywords": [
     "sequelize",
