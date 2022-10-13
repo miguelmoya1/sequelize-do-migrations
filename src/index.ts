@@ -1,6 +1,6 @@
-import { DataTypes, Sequelize, Model } from 'sequelize';
 import * as fs from 'fs';
 import * as path from 'path';
+import { DataTypes, Model, Sequelize } from 'sequelize';
 
 /**
  * Interface for migration files inside options.path
@@ -18,15 +18,17 @@ export type options = {
    */
   path?: string;
   /**
-   * false by defult
+   * false by default
    */
   showLogs?: boolean;
 };
 
-class SequelizeMigrations extends Model<Migrations> {}
+class SequelizeMigrations extends Model<Migrations> {
+  declare name: string;
+}
 
 /**
- * Execute the migrations that are in the ./migratios folder or the one specified in options.path
+ * Execute the migrations that are in the ./migrations folder or the one specified in options.path
  * @param sequelize Connection where do you want to save the migration history
  * @param options type options
  * @returns An array of strings with the name of the files executed and saved in the database
@@ -61,7 +63,7 @@ const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
   );
 
   await SequelizeMigrations.sync();
-  const migrations = (await SequelizeMigrations.findAll()) as any;
+  const migrations = await SequelizeMigrations.findAll();
 
   for await (const name of files) {
     if (name && migrations.findIndex((m) => m.name === name) === -1) {
