@@ -11,7 +11,7 @@ import { MigrationType, Options } from './types';
 /**
  * Execute the migrations that are in the ./migrations folder or the one specified in options.path
  * @param sequelize Connection where do you want to save the migration history
- * @param options type options
+ * @param options Options to configure the migrations
  * @returns An array of strings with the name of the files executed and saved in the database
  */
 const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
@@ -20,7 +20,7 @@ const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
 
   createGitkeep ??= true;
 
-  logger?.('\x1b[34mRUNNING MIGRATIONS...', '\x1b[0m');
+  logger?.('RUNNING MIGRATIONS...');
 
   if (!pathToMigrations) {
     pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
