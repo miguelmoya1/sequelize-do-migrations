@@ -16,7 +16,7 @@ import { MigrationType, Options } from './types';
  */
 const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
   const created: string[] = [];
-  let { path: pathToMigrations, logger, createGitkeep } = options;
+  let { path: pathToMigrations, logger, createGitkeep, verbose } = options;
 
   createGitkeep ??= true;
 
@@ -26,22 +26,22 @@ const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
     pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
   }
 
-  logger?.('PATH MIGRATIONS: ', pathToMigrations);
+  logger?.(`PATH MIGRATIONS: ${pathToMigrations}`);
 
   if (!fs.existsSync(pathToMigrations)) {
     fs.mkdirSync(pathToMigrations);
 
-    logger?.('PATH MIGRATIONS CREATED: ', pathToMigrations);
+    logger?.(`PATH MIGRATIONS CREATED: ${pathToMigrations}`);
   }
 
   const pathSrc = path.join(pathToMigrations.replace(/dist/, 'src'));
   if (!fs.existsSync(pathSrc)) {
     fs.mkdirSync(pathSrc);
-    logger?.('PATH MIGRATIONS CREATED: ', pathSrc);
+    logger?.(`PATH MIGRATIONS CREATED: ${pathSrc}`);
 
     if (createGitkeep) {
       fs.writeFileSync(path.join(pathSrc, '.gitkeep'), '');
-      logger?.('FILE .gitkeep CREATED: ', path.join(pathSrc, '.gitkeep'));
+      logger?.(`FILE .gitkeep CREATED: ${path.join(pathSrc, '.gitkeep')}`);
     }
   }
 
@@ -73,12 +73,14 @@ const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
           await migration.down(sequelize);
         }
 
-        logger?.('THE MIGRATION COULD NOT BE RUN: ', name);
+        logger?.(`THE MIGRATION COULD NOT BE RUN: ${name}`);
+
+        if (verbose) {
+          logger?.(`ERROR: ${e}`);
+        }
       }
     } else {
-      logger?.(
-        `${'\x1b[33m'}${name} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
-      );
+      logger?.(`${name} IT HAS ALREADY BEEN ADDED PREVIOUSLY`);
     }
   }
 

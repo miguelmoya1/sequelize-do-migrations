@@ -27,4 +27,10 @@ export type Options = {
    * @default true
    */
   createGitkeep?: boolean;
+
+  /**
+   * Show the error complete and not only the message
+   * @default false
+   */
+  verbose?: boolean;
 };
