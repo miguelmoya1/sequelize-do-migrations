@@ -1,31 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { DataTypes, Model, Sequelize } from 'sequelize';
-
-/**
- * Interface for migration files inside options.path
- */
-export type IMigrationType = {
-  up: (sequelize: Sequelize) => Promise<void>;
-  down: (sequelize: Sequelize) => Promise<void>;
-};
-
-type Migrations = { name: string };
-
-export type options = {
-  /**
-   * by default in the same folder, called "migrations"
-   */
-  path?: string;
-  /**
-   * false by default
-   */
-  showLogs?: boolean;
-};
-
-class SequelizeMigrations extends Model<Migrations> {
-  declare name: string;
-}
+import { Sequelize } from 'sequelize';
+import {
+  initMigrationModel,
+  MigrationsModel,
+} from './classes/migrations.model';
+import { getParentPath } from './tools';
+import { MigrationType, Options } from './types';
 
 /**
  * Execute the migrations that are in the ./migrations folder or the one specified in options.path
@@ -33,72 +14,75 @@ class SequelizeMigrations extends Model<Migrations> {
  * @param options type options
  * @returns An array of strings with the name of the files executed and saved in the database
  */
-const runMigrations = async (sequelize: Sequelize, options: options = {}) => {
-  let { path: pathToMigrations } = options;
-  const { showLogs } = options;
+const runMigrations = async (sequelize: Sequelize, options: Options = {}) => {
   const created: string[] = [];
+  let { path: pathToMigrations, logger, createGitkeep } = options;
 
-  if (showLogs) console.log('\x1b[34m', 'RUNNING MIGRATIONS...', '\x1b[0m');
+  createGitkeep ??= true;
+
+  logger?.('\x1b[34mRUNNING MIGRATIONS...', '\x1b[0m');
 
   if (!pathToMigrations) {
     pathToMigrations = path.join(path.dirname(getParentPath()), './migrations');
   }
 
+  logger?.('PATH MIGRATIONS: ', pathToMigrations);
+
   if (!fs.existsSync(pathToMigrations)) {
     fs.mkdirSync(pathToMigrations);
+
+    logger?.('PATH MIGRATIONS CREATED: ', pathToMigrations);
   }
 
-  if (showLogs) console.log('PATH MIGRATIONS: ', pathToMigrations);
+  const pathSrc = path.join(pathToMigrations.replace(/dist/, 'src'));
+  if (!fs.existsSync(pathSrc)) {
+    fs.mkdirSync(pathSrc);
+    logger?.('PATH MIGRATIONS CREATED: ', pathSrc);
+
+    if (createGitkeep) {
+      fs.writeFileSync(path.join(pathSrc, '.gitkeep'), '');
+      logger?.('FILE .gitkeep CREATED: ', path.join(pathSrc, '.gitkeep'));
+    }
+  }
 
   const files = fs
     .readdirSync(pathToMigrations)
     .filter((f) => f.endsWith('.js') && !f.endsWith('.map.js'))
     .map((file) => file.split('.').slice(0, -1).join('.'));
 
-  SequelizeMigrations.init(
-    {
-      name: { type: DataTypes.STRING, unique: true, primaryKey: true },
-    },
-    { sequelize, timestamps: true }
-  );
+  await initMigrationModel(sequelize);
 
-  await SequelizeMigrations.sync();
-  const migrations = await SequelizeMigrations.findAll();
+  const migrations = await MigrationsModel.findAll();
 
   for await (const name of files) {
     if (name && migrations.findIndex((m) => m.name === name) === -1) {
-      const migration: IMigrationType = require(path.join(
+      const migration: MigrationType = require(path.join(
         pathToMigrations,
         name
       ));
+
       try {
         await migration.up(sequelize);
-        await SequelizeMigrations.create({
+        await MigrationsModel.create({
           name,
         });
+
         created.push(name);
       } catch (e) {
-        if (migration.down) await migration.down(sequelize);
-        if (showLogs) console.log('THE MIGRATION COULD NOT BE RUN: ', name);
+        if (migration.down) {
+          await migration.down(sequelize);
+        }
+
+        logger?.('THE MIGRATION COULD NOT BE RUN: ', name);
       }
     } else {
-      if (showLogs) {
-        console.log(
-          `${'\x1b[33m'}${name} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
-        );
-      }
+      logger?.(
+        `${'\x1b[33m'}${name} ${'\x1b[31m'}IT HAS ALREADY BEEN ADDED PREVIOUSLY${'\x1b[0m'}`
+      );
     }
   }
 
   return created;
-};
-
-const getParentPath = () => {
-  const _prepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, stack) => stack;
-  const stack = new Error().stack!.slice(1);
-  Error.prepareStackTrace = _prepareStackTrace;
-  return (stack[1] as any).getFileName() as string;
 };
 
 export { runMigrations };

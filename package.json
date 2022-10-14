@@ -16,7 +16,8 @@
     "start": "tsc -w",
     "test": "jest --watch",
     "build": "tsc",
-    "prepublish": "yarn build"
+    "prepublish": "yarn build",
+    "test:local": "tsc -w -p ./test"
   },
   "dependencies": {
     "sequelize": "^6.24.0"
