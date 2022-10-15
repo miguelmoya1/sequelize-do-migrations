@@ -1,5 +1,5 @@
 {
-  "name": "@miguelmoya1/sequelize-do-migrations",
+  "name": "sequelize-do-migrations",
   "version": "1.1.1",
   "description": "Perform migrations from code in typescript",
   "main": "dist/index.js",
